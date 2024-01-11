@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Task List</title>
+</head>
+<body>
+
+<h2>Task List</h2>
+
+<table border="1">
+  <thead>
+  <tr>
+    <th>ID</th>
+    <th>Description</th>
+    <th>Status</th>
+    <th>Actions</th>
+  </tr>
+  </thead>
+  <tbody>
+  <!-- Iterate over the list of tasks and display each task in a table row -->
+  <tr th:each="task : ${tasks}">
+    <td th:text="${task.id}"></td>
+    <td th:text="${task.description}"></td>
+    <td th:text="${task.status}"></td>
+    <td>
+      <!-- Edit button as a form submit button -->
+      <form th:action="@{/tasks/{id}/edit(id=${task.id})}" method="get" style="display: inline;">
+        <button type="submit">Edit</button>
+      </form>
+
+      <!-- Delete button with a form to submit a delete request -->
+      <form th:action="@{/tasks/{id}(id=${task.id})}" method="post" style="display: inline;">
+        <input type="hidden" name="_method" value="delete"/>
+        <button type="submit">Delete</button>
+      </form>
+    </td>
+  </tr>
+  </tbody>
+</table>
+
+<!-- Pagination controls at the bottom -->
+<div>
+  <span>Items per page:</span>
+  <select id="pageSizeSelect" onchange="changePageSize(this.value)">
+    <option value="5" th:selected="${pageSize eq 5}">5</option>
+    <option value="10" th:selected="${pageSize eq 10}">10</option>
+    <option value="15" th:selected="${pageSize eq 15}">15</option>
+  </select>
+
+  <span>Page:</span>
+  <select id="pageSelect" onchange="changePage(this.value)">
+    <option th:each="i : ${#numbers.sequence(0, totalPages-1)}"
+            th:value="${i}" th:selected="${currentPage eq i}" th:text="${i + 1}"></option>
+  </select>
+</div>
+
+<script>
+  function changePageSize(size) {
+    window.location.href = '/tasks?page=0&size=' + size;
+  }
+
+  function changePage(page) {
+    var pageSize = document.getElementById("pageSizeSelect").value;
+    window.location.href = '/tasks?page=' + page + '&size=' + pageSize;
+  }
+</script>
+
+<!-- Form for creating a new task -->
+<h2>Create New Task</h2>
+<form th:action="@{/tasks}" method="post">
+  <label for="newDescription">Description:</label>
+  <input type="text" id="newDescription" name="description" required maxlength="100" />
+
+  <label for="newStatus">Status:</label>
+  <select id="newStatus" name="status">
+    <!-- Iterate over the Status enum values and populate the dropdown menu -->
+    <option th:each="status : ${T(com.todolist.todolist.models.Task$Status).values()}"
+            th:value="${status}" th:text="${#strings.capitalize(status.toString())}">
+    </option>
+  </select>
+
+  <!-- Submit button for creating a new task -->
+  <button type="submit">Create</button>
+</form>
+
+</body>
+</html>
+

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Edit Task</title>
+</head>
+<body>
+
+<h2>Edit Task</h2>
+
+<!-- Form for editing a task -->
+<form th:action="@{/tasks/{id}(id=${task.id})}" method="post">
+
+  <!-- Hidden input for the _method parameter to simulate a PATCH request -->
+  <input type="hidden" name="_method" value="patch"/>
+
+  <!-- Input fields for editing task properties -->
+  <label for="description">Description:</label>
+  <input type="text" id="description" name="description" required maxlength="100" />
+
+
+  <label for="status">Status:</label>
+  <select id="status" name="status">
+    <!-- Iterate over the Status enum values and populate the dropdown menu -->
+    <option th:each="status : ${T(com.todolist.todolist.models.Task$Status).values()}"
+            th:value="${status}" th:text="${#strings.capitalize(status.toString())}">
+    </option>
+  </select>
+
+  <!-- Submit button for updating the task -->
+  <input type="submit" value="Update"/>
+</form>
+
+<!-- Link to go back to the task list -->
+<a href="/tasks">Back to Task List</a>
+
+</body>
+</html>
